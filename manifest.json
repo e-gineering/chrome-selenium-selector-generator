@@ -1,0 +1,22 @@
+ { 
+  "manifest_version": 2,
+
+  "name": "Selenium Web Element Selector",
+  "description": "This extension will help determine unique Selenium WebElement ids and xpaths. Generates the @FindBy tags that can be used with PageFactory to initialize elements on the page.",
+  "version": "1.0",
+  "background": { 
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+      "name": "Click to change the icon's color"
+  },
+  "content_scripts": [{
+      "matches": ["http://*/*","https://*/*"],
+      "js": ["listener.js"]
+    }
+  ],
+  "permissions": [
+   "activeTab"
+   ]
+}
