@@ -1,16 +1,23 @@
-var enabled = false;
-chrome.browserAction.setIcon({path: "icon.png"});
+if(chrome.storage){
+	chrome.storage.sync.get("enabled", function(value){
+		var path = "icon.png";
+		if(value.enabled){
+			path = "icon-on.png";
+		}
+		chrome.browserAction.setIcon({path: path});
+	});
+}
 
 chrome.browserAction.onClicked.addListener(function(tab){
-	enabled = !enabled;
-	var path = "icon.png";
-	if(enabled){
-		path = "icon-on.png";
-	}
-
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	  chrome.tabs.sendMessage(tabs[0].id, {enabled: enabled}, function(response) {});
+	chrome.storage.sync.get("enabled", function(value){
+		console.log(value);
+		var enabled = !value.enabled;
+		chrome.storage.sync.set({"enabled": enabled}, function(){
+			var path = "icon.png";
+			if(enabled){
+				path = "icon-on.png";
+			}
+			chrome.browserAction.setIcon({path: path});
+		});
 	});
-
-	chrome.browserAction.setIcon({path: path});
 });
