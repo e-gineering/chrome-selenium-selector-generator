@@ -20,8 +20,15 @@ document.addEventListener('click', function(e){
 			//generate selection by css selector traits
 			setCssSelector(sourceElement, selectors);
 
+			//generate selection by element name
+			if(sourceElement.name){
+				setNameSelector(sourceElement, selectors);
+			}
+
 			// determine the best selector based on selector rankings
 			determineBestSelector(selectors);
+			// copy find by tag to clipboard
+			copyToClipboard(selectors.recommendedSelector);
 
 			console.log(selectors);
 		}
@@ -36,6 +43,16 @@ var setIDSelector = function(sourceElement, collector){
 	};
 
 	collector.id.selected = collector.id.element === sourceElement;
+}
+
+var setNameSelector = function(sourceElement, collector){
+	collector.name = {
+		selector: sourceElement.name,
+		tag: '@FindBy(name="' + sourceElement.name + '")',
+		element: document.getElementsByName(sourceElement.name)[0]
+	};
+
+	collector.name.selected = collector.name.element === sourceElement;
 }
 
 var setXPATHSelector = function(sourceElement, collector){
@@ -125,12 +142,26 @@ var setCssSelector = function(sourceElement, collector){
 
 var determineBestSelector = function(collector){
 	if(collector["id"] && collector["id"].selected){
-		collector.recommendedSelector = "id";
+		collector.recommendedSelector = collector.id.tag;
+	}else if(collector["name"] && collector["name"].selected){
+		collector.recommendedSelector = collector.name.tag;
 	}else if(collector["className"] && collector["className"].selected){
-		collector.recommendedSelector = "className";
+		collector.recommendedSelector = collector.className.tag;
 	}else if(collector["css"] && collector["css"].selected){
-		collector.recommendedSelector = "css";
+		collector.recommendedSelector = collector.css.tag;
 	}else if(collector["xpath"] && collector["xpath"].selected){
-		collector.recommendedSelector = "xpath";
+		collector.recommendedSelector = collector.xpath.tag;
 	}
+}
+var copyToClipboard = function(text){
+    var copyDiv = document.createElement('div');
+    copyDiv.contentEditable = true;
+    document.body.appendChild(copyDiv);
+    copyDiv.innerHTML = text;
+    copyDiv.unselectable = "off";
+    copyDiv.focus();
+    document.execCommand('SelectAll');
+    document.execCommand("Copy", false, null);
+    document.body.removeChild(copyDiv);
+    console.log("Tag " + text + " copied to your clipboard.");
 }
